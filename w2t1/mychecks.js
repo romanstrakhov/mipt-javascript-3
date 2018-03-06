@@ -5,8 +5,8 @@ var Collection = require('./index');
 // Создаем коллекцию чисел
 var numbers = new Collection();
 
-console.info(numbers);
-console.info(Object.getPrototypeOf(numbers));
+// console.info(numbers);
+// console.info(Object.getPrototypeOf(numbers));
 
 numbers.append(10);
 numbers.append(20);
