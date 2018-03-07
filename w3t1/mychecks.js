@@ -29,7 +29,8 @@ parallel(
     // Обработка результата выполнения операций (результирующий callback)
     function (errors, result) {
         assert.deepEqual(errors, null);
-        assert.deepEqual(result, ['500ms', '50ms', '200ms']);
+        // assert.deepEqual(result, ['500ms', '50ms', '200ms']);
+        assert.deepEqual(result, ['50ms', '200ms', '500ms']);
 
         completeTest();
     }
@@ -71,6 +72,7 @@ parallel(
 var tests = 2;
 function completeTest() {
     tests--;
+    // console.log ("> " + tests + " tests left");
     if (tests === 0) {
         console.info('OK!');
     }
