@@ -87,4 +87,190 @@ Promise
   .reject(new Error('...'))
   .catch (console.error);
 
-  
+
+# Node.js
+
+## Ресурсы
+
+CPU — вычисления
+Memory — 
+Система ввода-вывода
+
+
+## Паттерн Reactor
+- Application: IO / Callback Handler
+- Requests: IO -> Event Demultiplexer -> (return) / (done) --> Callback
+- Results: Callback -> Event Queue
+
+Apache: multithreading (>memory)
+Nginx: Reactor
+
+
+Ryan Dahl: Node.js
+
+
+Event Demultiplexer (Event notification interface)
+( epoll | kqueue | I/O Completion Port API ) -> LIBUV interface
+
+## libuv
+
+linux: 
+
+Операции над локальными файлами всегда блокирующие
+Решение -> multithreading (по умолчанию 4 потока)
+=> 4 долгих операции над локальными файлами блокируют все приложение
+
+## Паттерн Callback
+
+- Callback идет последним аргументом
+- Error comes first
+
+## API в Node.js = Core Javascript API
+
+- fs — работа с файловой системой
+- http – запросы
+- console — логирование
+
+Core JS API + bindings + LIBUV + V8 = Node.js
+
+Четные версии — LTS (стабильные, long-time support)
+Нечетные версии — текущие 
+
+## Модули Node.js ##
+
+Язык модулей — по спецификации CommonJS
+
+// module = {
+//  filename: 'absolute_path/module.js',
+//  exports: {}
+// }
+
+module.exports.functionname = function () {};
+exports.functionname = function () {}; // лакончиная запись, но сработает только для объекта, т.к. по сути просто перезапись поля
+
+var module = require('./module.js');
+module.functionname();
+
+module.exports = function () {};
+
+var functionname = require('./module.js');
+functionname();
+
+NB: Можно экспортировать не только объект или функцию, но и число, и конструктор, объект на основе конструктора
+
+Встроенные модули (Core API):
+- url — работа с адресами (parse, ... etc)
+
+Сторонние модули:
+- lodash — полезные методы для работы с объектами и массивами 
+
+## Кеширование модулей после первого подключения
+
+require.cash = 
+{
+  'absolute_path/module.js': {
+    filename: '..',
+    exports: {}
+  }
+}
+
+## npm 
+
+npm init — создание модуля -> файл-манифест package.json
+npm search — поиск пакета в хранилище
+npm show packagename — информация о пакете
+npm install packagename[@version] — установка пакета в качестве зависимости
+  --save — зависимость фиксируется в package.json
+  --save-dev — зависимости не нужные для работы модуля (например, тестирование)
+
+package.json
+{
+  "dependencies": {
+    "express": "1.2.3",
+    "express": ">1.2.3",
+    "express": ">=1.2.3",
+    "express": "~1.2.3", // >=1.2.3 <1.3.0
+    "express": "^1.2.3", // >=1.2.3 <2.0.0
+    "express": "1.2.*",
+    "express": "latest",
+    "express": "git://github.com/expressjs/express.git",
+    "express": "git://github.com/expressjs/express.git#4.13.4", // тег
+    "express": "git://github.com/expressjs/express.git#master", // ветка
+    "express": "git://github.com/expressjs/express.git#f3d99a", // commit
+    "express": "expressjs/express.git", // сокращенная запись для github.com
+    ...
+  }
+}
+
+.npmrc
+
+save=true // всегда фиксировать зависимости
+save-exact=true // всегда фиксировать версию (рекомендуется!)
+init-author-name='Roman Strakhov' // имя по умолчанию для новых пакетовъ
+
+## Node.js Core API 
+
+var http = require('http');
+
+## Event Emitter
+
+Позволяет подписывать объекты на события и назначать для этих событий обработчики:
+
+var EventEmitter = require('events').EventEmitter;
+var emitter = new EventEmitter();
+
+emitter.on('log', console.info);
+
+emitter.emit('log', 'Hello!'); // Hello!
+emitter.emit('unknown event'); // Do nothing
+emitter.emit('error'); // Uncaught 'error' event!
+
+Модуль url
+- url.parse()
+- url.format()
+
+Модуль querystring
+- querystring.parse( "a=1&b=2" )
+- querystring.stringify( { a:1, b:2 } )
+
+## Работа с файловой системой (модуль fs)
+
+var fs = require('fs');
+fs.readFile(absolute_filename, function(err, content) { 
+  console.info(content); // typeof(content) == "buffer"
+  console.info(content.toString('utf-8'));
+});
+
+fs.readFile(absolute_filename, 'utf-8', function(err, data) { 
+  console.info(data); // typeof(data) == String
+});
+
+
+require('buffer'); // модуль для работы с бинарными данными, массив чисел 0-255
+
+var letterB = new Buffer([98]);
+console.info(letterB.toString()); // b
+console.info(letterB.toString('utf-8')); // b
+
+fs.appendFile()
+fs.writeFile()
+fs.unlink()
+fs.mkdir()
+
+fs.stat(__filename, function (stats) {
+  console.info(stat.isDirectory()); // false
+};
+
+fs.watch(__filename, function (event, filename) {
+  console.info(event); // change (изменен) or rename (переименован)
+});
+
+
+
+
+
+
+
+
+
+
