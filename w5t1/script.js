@@ -21,57 +21,38 @@ var validateForm = function(args) {
 	form.addEventListener('submit', function(event) {
 		event.preventDefault();
 		var nErrors = 0;
+		var inputs = form.querySelectorAll('input');
 		for (var i=0; i<inputs.length; i++) {
 			if (!validateInput(inputs[i])) {
 				nErrors++;
-				// console.log("Invalid: " + inputs[i].id);		
 			}
 		}
 		setValid(event.target, nErrors===0);
-
-
 	});
 
-	// inputs
 
-	var inputs = form.querySelectorAll('input');
-
-	// console.info(inputs);
-
-	for (var i=0; i<inputs.length; i++) {
-		inputs[i].addEventListener('blur', function(event) {
-			// console.log('<blur> ' + event.target.id);
+	form.addEventListener('blur', function(event) {
+		if (event.target.tagName === 'INPUT') {
+			event.stopPropagation;
 			validateInput(event.target);
-		});
+		}
+	}, true);
 
-		inputs[i].addEventListener('focus', function(event) {
-			// console.log('<focus> ' + event.target.id);
+	form.addEventListener('focus', function(event) {
+		if (event.target.tagName === 'INPUT') {
+			event.stopPropagation;			
 			setError(event.target, false);
-		});
-
-
-	}
-
-
+		}
+	}, true);
 
 	function validateInput(item) {
 
-
-		// console.log("validator on " + item.id);
-		// console.info(item.dataset);
-		// console.info(item.dataset.validator);
-
-		var required = item.dataset.required;
-
-		if (required!==undefined && item.value==='') {
-			// console.log("Validator: Empty field " + item.id)
+		if (item.dataset.required!==undefined && item.value==='') {
 			return !setError(item, true);
 		}
 
-		// required test
-		var validator = item.dataset.validator;			
-
-		// content validator		
+		// content validator
+		var validator = item.dataset.validator;
 		switch (validator) {
 			case 'letters':
 				return !setError(item, !isLetters(item));
@@ -91,6 +72,8 @@ var validateForm = function(args) {
 
 	function isLetters(item) {
 
+		// TODO: Benchmark this straight-forward technique vs. regexp /^[a-zа-яё]+$/i
+
 		var letters = "abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя";
 		letters += letters.toUpperCase();
 
@@ -108,8 +91,7 @@ var validateForm = function(args) {
 
 		var value = Number(item.value);
 
-
-		if (isNaN(value) || item.value.indexOf(' ')!==-1) {
+		if (isNaN(value) || item.value.indexOf(' ')!==-1) { // patch for one sapce (otherwise it gives 0)
 			return false;
 		}
 
@@ -131,8 +113,8 @@ var validateForm = function(args) {
 
 
 	function setValid(form, state) {
-		if ( (arguments.length<2) || state ) {
-			// set valid
+
+		if ( (arguments.length<2) || state ) { // set valid
 			if (form.classList.contains(formInvalidClass)) {
 				form.classList.remove(formInvalidClass);
 			}
@@ -140,8 +122,7 @@ var validateForm = function(args) {
 				form.classList.add(formValidClass);
 			}
 			return true;
-		} else {
-			// set invalid
+		} else { // set invalid
 			if (form.classList.contains(formValidClass)) {
 				form.classList.remove(formValidClass);
 			}
@@ -153,14 +134,12 @@ var validateForm = function(args) {
 	}
 
 	function setError(item, state) {
-		if ( (arguments.length<2) || state ) {
-			// set error
+		if ( (arguments.length<2) || state ) { // set error
 			if (!item.classList.contains(inputErrorClass)) {
 				item.classList.add(inputErrorClass);
 			}
 			return true; 
-		} else {
-			// remove error
+		} else { // remove error
 			if (item.classList.contains(inputErrorClass)) {
 				item.classList.remove(inputErrorClass);
 			}
