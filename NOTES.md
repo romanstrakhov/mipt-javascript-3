@@ -267,6 +267,127 @@ fs.watch(__filename, function (event, filename) {
 
 
 
+# DOM #
+
+document.getElementByID() // object HTMLFormElement
+document.getElementByTagName() // object HTMLCollection — устаревший!
+document.querySelector("#idname") // object HTMLFormElement
+document.querySelector(".classname") // object HTMLFormElement
+document.querySelector('[name="login"]') // object HTMLFormElement
+
+document.querySelector() возврацает только первый элемент
+document.querySelectorAll() // object Nodelist — не массив! (array-like: индексирование, .length)
+
+var [Array] = Array.prototype.slice.call( [object Nodelist] )
+var [Array] = Array.from( [object Nodelist] )
+
+## Атрибуты
+
+var form = document.getElementById('auth');
+
+form.getAttribute('action'); // '/login/'
+form.hasAttribute('method'); // false
+form.setAttribute('method', 'POST');
+form.removeAttribute('method');
+
+### data-атрибуты
+
+form.getAttribute('data-form-value'); // 123
+form.dataset.formValue; // 123
+form.dataset.hasOwnProperty('formValue'); // true
+form.hasAttribute('data-form-value'); // 123
+
+## Свойства ##
+
+Не слишком предсказуемые! Использовать осторожно!
+
+form.action; // "https://yandex.ru/login/"
+form.method; // "get"
+form.id; // "auth"
+
+form.classname; // 'auth form'
+form.classname += ' login-form';
+
+### Классы ###
+
+form.classList.add('login-form');
+form.classList.item(1); // 'form'
+form.classList.item(2); // 'login-form'
+form.classList.contains('login-form'); // true
+form.classList.remove('login-form');
+
+## Создание элементов ##
+
+var elem = document.createElement('span');
+
+elem.className = 'error';
+elem.setAttribute('id','auth-error');
+elem.setAttribute('status','auth-error');
+elem.textContent = 'Error!';
+
+document.body.appendChild(elem);
+
+var clone = elem.cloneNode(false); // true — копировать дочерние элементы 
+
+
+## События в DOM ##
+
+Можно явно пропистать в HTML:
+<... onsubmit="js-function">
+<... onclick="js-function">
+но с этим невозможно гибко работать (только один обработчик, связь HTML-JS, при изменении HTML нужно помнить, нельзя навешивать динамически)
+
+form.addEventListener('submit', submitHandler);
+form.addEventListener('submit', yetAnotherSubmitHandler);
+form.addEventListener('submit', function (event) {
+  console.log(this, event);
+});
+
+Обработчики вызываются в прямом порядке
+
+this — объект, в котором произошло событие (???)
+
+event.target — последний лист дерева, в котором произошло событие
+event.altKey
+event.ctrlKey
+event.shiftKey
+event.type
+
+Обработка событий (третий аргумент addEventListener):
+- Bubbling/всплытие (по умолчанию, false) — с самого глубокого элемента
+- Capturing/перехват (true) — погружается начиная с самого верхнего
+- Bubbling + stopPropagation <= event.stopPropagation()
+- Caprturing + stopPropagation <= event.stopPropagation()
+- Отмена всплытия/погружения и отмена всех других обработчиков <= event.stopImmediatePropagation()
+
+Отмена действий по умолчанию:
+event.preventDefault();
+
+Делегирование событий родительским узлам:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
